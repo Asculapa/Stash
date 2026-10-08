@@ -25,6 +25,6 @@ defmodule Stash do
   end
 
   defp via(name) do
-    {:via, Registry, {KV, name}}
+    {:via, Registry, {Stash, name}}
   end
 end
