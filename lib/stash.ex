@@ -2,9 +2,13 @@ defmodule Stash do
   use Application
 
   def start(_type, _args) do
+    port = Application.fetch_env!(:stash, :port)
+
     children = [
       {Registry, name: Stash, keys: :unique},
-      {DynamicSupervisor, name: Stash.BucketSupervisor, strategy: :one_for_one}
+      {DynamicSupervisor, name: Stash.BucketSupervisor, strategy: :one_for_one},
+      {Task.Supervisor, name: Stash.ServerSupervisor},
+      Supervisor.child_spec({Task, fn -> Stash.Server.accept(port) end}, restart: :permanent)
     ]
 
     Supervisor.start_link(children, strategy: :one_for_one)
